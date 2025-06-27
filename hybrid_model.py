@@ -1,17 +1,19 @@
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-from basicsr.models import SRGANModel
+from basicsr.models.srgan_model import SRGANModel  # ← Changed this line
 from basicsr.utils.registry import MODEL_REGISTRY
+from basicsr.utils import tensor2img, imwrite      # ← Added this line
 from collections import OrderedDict
 import numpy as np
+import os.path as osp                              # ← Added this line
+from tqdm import tqdm                              # ← Added this line
 from basicsr.losses import GANLoss
 from basicsr.losses.basic_loss import l1_loss, mse_loss
 
 # Импортируем модифицированные версии
 from models.network_swinir import SwinIR
 from realesrgan.archs.discriminator_arch import UNetDiscriminatorSN
-
 
 class TemperaturePerceptualLoss(nn.Module):
     """Perceptual loss адаптированный для температурных данных"""
@@ -320,23 +322,3 @@ class TemperatureSRModel(SRGANModel):
 
         if with_metrics:
             self._report_metric_results(dataset_name)
-
-
-def tensor2img(tensor, out_type=np.float32, min_max=(0, 1)):
-    """Конвертация тензора в numpy array для температурных данных"""
-    img = tensor.squeeze().float().cpu().clamp_(*min_max)
-    img = (img - min_max[0]) / (min_max[1] - min_max[0])
-
-    if out_type == np.uint8:
-        img = (img * 255.0).round()
-
-    img = img.numpy().astype(out_type)
-
-    if img.ndim == 2:
-        # Одноканальное изображение
-        return img
-    elif img.ndim == 3:
-        # Если есть канальное измерение, берем первый канал
-        return img[0]
-    else:
-        return img

@@ -8,10 +8,13 @@ import os
 import numpy as np
 import torch
 from tqdm import tqdm
+import matplotlib
+matplotlib.use('Agg')  # Use non-interactive backend
 import matplotlib.pyplot as plt
 
 from data_preprocessing import TemperatureDataPreprocessor
-from hybrid_model import TemperatureSRModel, tensor2img
+from basicsr.utils import tensor2img, imwrite  # ← Changed this line
+from hybrid_model import TemperatureSRModel     # ← Changed this line
 from config_temperature import *
 
 

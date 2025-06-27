@@ -113,8 +113,6 @@ train = {
     'net_d_init_iters': 1000,
     # Частота сохранения
     'manual_seed': 10,
-    'val_freq': 5000,
-    'save_checkpoint_freq': 5000,
     'use_grad_clip': True,
     'grad_clip_norm': 1.0
 }

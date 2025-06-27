@@ -16,9 +16,8 @@ import gc
 
 from basicsr.utils import (get_time_str, get_root_logger, get_env_info,
                            make_exp_dirs, set_random_seed, tensor2img)
-from basicsr.utils.options import dict2str, parse_options
+from basicsr.utils.options import dict2str
 from basicsr.data.prefetch_dataloader import CPUPrefetcher
-from basicsr.models import create_model
 from basicsr.utils.registry import MODEL_REGISTRY
 
 # Импортируем наши модули
@@ -58,7 +57,7 @@ def setup_logger(opt):
     return logger
 
 
-def create_dataloaders(args, opt, preprocessor):
+def create_dataloaders(args, opt, preprocessor, logger):
     """Создание загрузчиков данных"""
     # Получаем список NPZ файлов
     npz_files = sorted([os.path.join(args.data_dir, f)
@@ -68,7 +67,6 @@ def create_dataloaders(args, opt, preprocessor):
     if args.debug:
         npz_files = npz_files[:2]  # Используем только 2 файла в debug режиме
 
-    logger = get_root_logger()
     logger.info(f"Found {len(npz_files)} NPZ files")
 
     # Разделяем на train и validation
@@ -95,7 +93,7 @@ def create_dataloaders(args, opt, preprocessor):
     return train_loader, val_loader
 
 
-def train_one_epoch(model, dataloader, current_iter, opt, logger):
+def train_one_epoch(model, dataloader, current_iter, opt, logger, val_loader):
     """Обучение на одной эпохе"""
     model.net_g.train()
     if hasattr(model, 'net_d'):
@@ -200,11 +198,16 @@ def main():
 
     # Создаем загрузчики данных
     logger.info('Creating dataloaders...')
-    train_loader_manager, val_loader = create_dataloaders(args, opt, preprocessor)
+    train_loader_manager, val_loader = create_dataloaders(args, opt, preprocessor, logger)
 
-    # Создаем модель
+    # Создаем модель напрямую
     logger.info('Creating model...')
-    model = create_model(opt)
+    # Регистрируем модель, если еще не зарегистрирована
+    if 'TemperatureSRModel' not in MODEL_REGISTRY._obj_map:
+        MODEL_REGISTRY.register(TemperatureSRModel)
+
+    # Создаем экземпляр модели напрямую
+    model = TemperatureSRModel(opt)
 
     # Возобновление обучения
     start_iter = 0
@@ -236,7 +239,7 @@ def main():
             # Обучаем на текущем файле
             for file_epoch in range(incremental_training['epochs_per_file']):
                 logger.info(f'  File epoch {file_epoch + 1}/{incremental_training["epochs_per_file"]}')
-                current_iter = train_one_epoch(model, train_loader, current_iter, opt, logger)
+                current_iter = train_one_epoch(model, train_loader, current_iter, opt, logger, val_loader)
 
             # Сохраняем checkpoint после каждого файла
             if incremental_training['checkpoint_per_file']:
