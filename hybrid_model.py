@@ -116,24 +116,28 @@ class TemperatureSRModel(SRGANModel):
     """Гибридная модель для Super-Resolution температурных данных"""
 
     def __init__(self, opt):
-        super(TemperatureSRModel, self).__init__(opt)
+        # Call parent init but skip training settings
+        self.opt = opt
+        self.device = torch.device('cuda' if opt.get('num_gpu', 0) > 0 else 'cpu')
+        self.is_train = opt.get('is_train', True)
 
-        # Переопределяем сеть генератора на SwinIR
+        # Build generator
         self.net_g = self.build_swinir_generator(opt)
-        self.net_g = self.model_to_device(self.net_g)
+        self.net_g = self.net_g.to(self.device)
         self.print_network(self.net_g)
 
-        # Переопределяем дискриминатор для 1 канала
+        # Build discriminator BEFORE calling parent init
         if self.is_train:
             self.net_d = UNetDiscriminatorSN(
                 num_in_ch=1,  # 1 канал для температуры
                 num_feat=opt['network_d'].get('num_feat', 64),
                 skip_connection=opt['network_d'].get('skip_connection', True)
             )
-            self.net_d = self.model_to_device(self.net_d)
+            self.net_d = self.net_d.to(self.device)
             self.print_network(self.net_d)
 
-            # Инициализация losses
+        # Now call parent's init_training_settings
+        if self.is_train:
             self.init_training_settings()
 
     def build_swinir_generator(self, opt):
