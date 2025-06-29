@@ -8,7 +8,6 @@ from collections import OrderedDict
 import numpy as np
 import os.path as osp                              # ← Added this line
 from tqdm import tqdm                              # ← Added this line
-from basicsr.losses import GANLoss
 from basicsr.losses.basic_loss import l1_loss, mse_loss
 
 # Импортируем модифицированные версии
@@ -181,6 +180,7 @@ class TemperatureSRModel(SRGANModel):
 
         # GAN loss
         if train_opt.get('gan_opt'):
+            from basicsr.losses.gan_loss import GANLoss
             self.cri_gan = GANLoss(
                 train_opt['gan_opt']['gan_type'],
                 real_label_val=1.0,
