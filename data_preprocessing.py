@@ -110,7 +110,13 @@ class TemperatureDataset(Dataset):
         # Загружаем данные
         print(f"Loading {npz_file}...")
         data = np.load(npz_file, allow_pickle=True)
-        self.swaths = data['swaths']
+        if 'swaths' in data:
+            self.swaths = data['swaths']
+        elif 'swath_array' in data:
+            self.swaths = data['swath_array']
+        else:
+            print(f"Available keys in NPZ: {list(data.keys())}")
+            raise KeyError(f"Neither 'swaths' nor 'swath_array' found in {npz_file}")
 
         # Подготавливаем пары LR-HR
         self.lr_hr_pairs = []
