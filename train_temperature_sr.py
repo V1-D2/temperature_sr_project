@@ -25,7 +25,11 @@ from data_preprocessing import (TemperatureDataPreprocessor,
                                 IncrementalDataLoader,
                                 create_validation_set)
 from hybrid_model import TemperatureSRModel
-from config_temperature import *
+from config_temperature import (
+    name, model_type, scale, num_gpu, datasets, network_g, network_d,
+    path, train, val, logger as logger_config, dist_params,
+    temperature_specific, incremental_training
+)
 
 
 def parse_args():
@@ -162,7 +166,7 @@ def main():
         'path': path,
         'train': train,
         'val': val,
-        'logger': logger,
+        'logger': logger_config,
         'dist_params': dist_params,
         'temperature_specific': temperature_specific,
         'incremental_training': incremental_training,
