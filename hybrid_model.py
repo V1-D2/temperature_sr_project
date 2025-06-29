@@ -116,28 +116,33 @@ class TemperatureSRModel(SRGANModel):
     """Гибридная модель для Super-Resolution температурных данных"""
 
     def __init__(self, opt):
-        # Call parent init but skip training settings
+        # Initialize base attributes that parent class expects
         self.opt = opt
         self.device = torch.device('cuda' if opt.get('num_gpu', 0) > 0 else 'cpu')
         self.is_train = opt.get('is_train', True)
 
-        # Build generator
+        # Initialize required lists
+        self.optimizers = []
+        self.schedulers = []
+
+        # Build our custom generator
         self.net_g = self.build_swinir_generator(opt)
         self.net_g = self.net_g.to(self.device)
+        self.print_network = lambda x: print(
+            f"Network: {x.__class__.__name__}, parameters: {sum(p.numel() for p in x.parameters()):,}")
         self.print_network(self.net_g)
 
-        # Build discriminator BEFORE calling parent init
+        # Build discriminator BEFORE training setup
         if self.is_train:
             self.net_d = UNetDiscriminatorSN(
-                num_in_ch=1,  # 1 канал для температуры
+                num_in_ch=1,
                 num_feat=opt['network_d'].get('num_feat', 64),
                 skip_connection=opt['network_d'].get('skip_connection', True)
             )
             self.net_d = self.net_d.to(self.device)
             self.print_network(self.net_d)
 
-        # Now call parent's init_training_settings
-        if self.is_train:
+            # Now initialize training settings
             self.init_training_settings()
 
     def build_swinir_generator(self, opt):
