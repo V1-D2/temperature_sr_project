@@ -24,7 +24,7 @@ echo "Installing required packages..."
 apptainer exec --nv \
     --bind $HOME/local-python:$HOME/.local \
     /home/shared/containers/tensorflow-25.02-py3.sif \
-    pip install --user basicsr opencv-python
+    pip install --user basicsr opencv-python timm facexlib gfpgan tqdm matplotlib
 
 # Проверим среду в TensorFlow контейнере
 echo "Testing environment in TensorFlow container:"
