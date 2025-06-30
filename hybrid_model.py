@@ -199,9 +199,25 @@ class TemperatureSRModel(SRGANModel):
         else:
             self.cri_gan = None
 
+        # Set training parameters
+        self.net_d_iters = train_opt.get('net_d_iters', 1)
+        self.net_d_init_iters = train_opt.get('net_d_init_iters', 0)
+
         # Настройка оптимизаторов
         self.setup_optimizers()
         self.setup_schedulers()
+
+    def setup_schedulers(self):
+        """Set up schedulers."""
+        train_opt = self.opt['train']
+        scheduler_type = train_opt['scheduler'].pop('type')
+
+        if scheduler_type == 'MultiStepLR':
+            from torch.optim.lr_scheduler import MultiStepLR
+            for optimizer in self.optimizers:
+                self.schedulers.append(
+                    MultiStepLR(optimizer, **train_opt['scheduler'])
+                )
 
     def optimize_parameters(self, current_iter):
         """Оптимизация с учетом физических ограничений"""
