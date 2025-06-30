@@ -66,6 +66,9 @@ echo "Starting Temperature SR training with TensorFlow container:"
 # Change to project directory
 cd $HOME/temperature_sr_project
 
+# Fix CUDA memory fragmentation
+export PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True
+
 # Запускаем Temperature SR обучение в TensorFlow контейнере
 apptainer exec --nv \
     --bind $HOME/local-python:$HOME/.local \

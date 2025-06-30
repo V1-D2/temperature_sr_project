@@ -17,7 +17,7 @@ datasets = {
             'target_width': 420
         },
         'scale_factor': 8,
-        'batch_size': 8,
+        'batch_size': 2,
         'samples_per_file': 1000,  # Ограничение для управления памятью
         'num_worker': 4,
         'pin_memory': True,

@@ -124,6 +124,10 @@ def train_one_epoch(model, dataloader, current_iter, opt, logger, val_loader):
                 message += f' {k}: {v:.4e}'
             logger.info(message)
 
+        # Clean GPU memory every 50 iterations
+        if current_iter % 50 == 0:
+            torch.cuda.empty_cache()
+
         # Сохранение модели
         if current_iter % opt['logger']['save_checkpoint_freq'] == 0:
             logger.info('Saving models and training states.')
@@ -182,7 +186,11 @@ def main():
             torch.distributed.init_process_group(backend='nccl')
 
     # Создаем директории
-    make_exp_dirs(opt)
+    try:
+        make_exp_dirs(opt)
+    except FileNotFoundError:
+        # Create the directory if it doesn't exist
+        os.makedirs(opt['path']['experiments_root'], exist_ok=True)
 
     # Настройка логгера
     logger = setup_logger(opt)
