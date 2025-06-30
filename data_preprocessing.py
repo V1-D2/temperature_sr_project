@@ -9,7 +9,7 @@ import gc
 class TemperatureDataPreprocessor:
     """Препроцессор для температурных данных AMSR-2"""
 
-    def __init__(self, target_height: int = 2000, target_width: int = 420):
+    def __init__(self, target_height: int = 2000, target_width: int = 400):
         self.target_height = target_height
         self.target_width = target_width
         self.stats = {'min': float('inf'), 'max': float('-inf'), 'mean': 0, 'std': 0}
