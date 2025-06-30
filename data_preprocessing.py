@@ -9,7 +9,7 @@ import gc
 class TemperatureDataPreprocessor:
     """Препроцессор для температурных данных AMSR-2"""
 
-    def __init__(self, target_height: int = 2000, target_width: int = 400):
+    def __init__(self, target_height: int = 2000, target_width: int = 420):
         self.target_height = target_height
         self.target_width = target_width
         self.stats = {'min': float('inf'), 'max': float('-inf'), 'mean': 0, 'std': 0}
@@ -83,8 +83,17 @@ class TemperatureDataPreprocessor:
         """Создание пары низкое-высокое разрешение для обучения"""
         h, w = hr_temp.shape
 
+        # Ensure dimensions are divisible by scale_factor * window_size
+        window_size = 8  # SwinIR window size
+        factor = scale_factor * window_size
+
+        # Crop HR to nearest smaller size divisible by factor
+        new_h = (h // factor) * factor
+        new_w = (w // factor) * factor
+        hr_temp = hr_temp[:new_h, :new_w]
+
         # Создаем LR версию через среднее по областям (физически корректно)
-        lr_h, lr_w = h // scale_factor, w // scale_factor
+        lr_h, lr_w = new_h // scale_factor, new_w // scale_factor
         lr_temp = np.zeros((lr_h, lr_w), dtype=np.float32)
 
         for i in range(lr_h):
