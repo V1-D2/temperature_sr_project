@@ -17,8 +17,8 @@ datasets = {
             'target_width': 420
         },
         'scale_factor': 8,
-        'batch_size': 4,
-        'samples_per_file': 10000,  # Ограничение для управления памятью
+        'batch_size': 8,
+        'samples_per_file': 1000,  # Ограничение для управления памятью
         'num_worker': 4,
         'pin_memory': True,
         'persistent_workers': True
@@ -119,7 +119,7 @@ train = {
 
 # Параметры валидации
 val = {
-    'val_freq': 5000,
+    'val_freq': 1000,
     'save_img': True,
     'metrics': {
         'psnr': {
@@ -166,7 +166,7 @@ temperature_specific = {
 # Инкрементальное обучение
 incremental_training = {
     'enabled': True,
-    'epochs_per_file': 5,
+    'epochs_per_file': 1,
     'learning_rate_decay_per_file': 0.95,
     'checkpoint_per_file': True,
     'shuffle_files': True
