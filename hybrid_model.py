@@ -347,3 +347,60 @@ class TemperatureSRModel(SRGANModel):
 
         if with_metrics:
             self._report_metric_results(dataset_name)
+
+    def _initialize_best_metric_results(self, dataset_name):
+        """Initialize metric results dict."""
+        if not hasattr(self, 'best_metric_results'):
+            self.best_metric_results = {}
+
+        # Initialize record for this dataset
+        record = {}
+        for metric, content in self.opt['val']['metrics'].items():
+            record[metric] = {'better': 'higher', 'val': float('-inf'), 'iter': -1}
+            if content.get('better', 'higher') == 'lower':
+                record[metric]['better'] = 'lower'
+                record[metric]['val'] = float('inf')
+        self.best_metric_results[dataset_name] = record
+
+    def _update_metric(self, metric_data, dataset_name, metric_name, opt_):
+        """Update metric results."""
+        if metric_name == 'psnr':
+            from basicsr.metrics import calculate_psnr
+            value = calculate_psnr(metric_data['img'], metric_data['img2'],
+                                   crop_border=opt_.get('crop_border', 0),
+                                   test_y_channel=opt_.get('test_y_channel', False))
+        elif metric_name == 'ssim':
+            from basicsr.metrics import calculate_ssim
+            value = calculate_ssim(metric_data['img'], metric_data['img2'],
+                                   crop_border=opt_.get('crop_border', 0),
+                                   test_y_channel=opt_.get('test_y_channel', False))
+        else:
+            # For other metrics, use basicsr's calculate_metric
+            from basicsr.metrics import calculate_metric
+            value = calculate_metric(metric_data, opt_)
+
+        # Store the metric value
+        if not hasattr(self, 'metric_results'):
+            self.metric_results = {}
+        if dataset_name not in self.metric_results:
+            self.metric_results[dataset_name] = {}
+        self.metric_results[dataset_name][metric_name] = value
+
+        # Update best metric if needed
+        if value > self.best_metric_results[dataset_name][metric_name]['val']:
+            self.best_metric_results[dataset_name][metric_name]['val'] = value
+            self.best_metric_results[dataset_name][metric_name]['iter'] = metric_data.get('iter', -1)
+
+    def _report_metric_results(self, dataset_name):
+        """Report average metrics."""
+        from basicsr.utils import get_root_logger
+        logger = get_root_logger()
+
+        if hasattr(self, 'metric_results') and dataset_name in self.metric_results:
+            for metric_name, metric_value in self.metric_results[dataset_name].items():
+                logger.info(f'Validation {dataset_name} - {metric_name}: {metric_value:.4f}')
+
+                # Report best metric
+                if hasattr(self, 'best_metric_results') and dataset_name in self.best_metric_results:
+                    best_info = self.best_metric_results[dataset_name][metric_name]
+                    logger.info(f'Best {metric_name}: {best_info["val"]:.4f} at iter {best_info["iter"]}')
