@@ -116,6 +116,8 @@ class TemperatureDataset(Dataset):
         self.scale_factor = scale_factor
         self.max_samples = max_samples
 
+        self.opt = {'name': 'TemperatureDataset'}
+
         # Загружаем данные
         print(f"Loading {npz_file}...")
         data = np.load(npz_file, allow_pickle=True)
