@@ -131,7 +131,8 @@ def train_one_epoch(model, dataloader, current_iter, opt, logger, val_loader):
         # Сохранение модели
         if current_iter % opt['logger']['save_checkpoint_freq'] == 0:
             logger.info('Saving models and training states.')
-            model.save(current_iter)
+            model.current_iter = current_iter
+            model.save()
 
         # Валидация
         if opt['val'] and current_iter % opt['val']['val_freq'] == 0:
@@ -256,7 +257,8 @@ def main():
             # Сохраняем checkpoint после каждого файла
             if incremental_training['checkpoint_per_file']:
                 logger.info(f'Saving checkpoint after file {file_idx + 1}')
-                model.save(current_iter)
+                model.current_iter = current_iter
+                model.save()
 
             # Уменьшаем learning rate между файлами
             if incremental_training['learning_rate_decay_per_file'] < 1.0:
@@ -278,12 +280,14 @@ def main():
 
         # Сохранение модели в конце эпохи
         logger.info(f'Saving models at epoch {epoch + 1}')
-        model.save(current_iter)
+        model.current_iter = current_iter
+        model.save()
 
     logger.info('Training completed!')
 
     # Финальное сохранение
-    model.save(current_iter)
+    model.current_iter = current_iter
+    model.save()
 
     # Сохраняем статистику препроцессора
     stats_path = os.path.join(path['models'], 'preprocessor_stats.npz')
