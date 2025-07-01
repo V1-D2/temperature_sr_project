@@ -256,7 +256,7 @@ def main():
             # Сохраняем checkpoint после каждого файла
             if incremental_training['checkpoint_per_file']:
                 logger.info(f'Saving checkpoint after file {file_idx + 1}')
-                model.save(f'file_{file_idx}_{current_iter}')
+                model.save(current_iter)
 
             # Уменьшаем learning rate между файлами
             if incremental_training['learning_rate_decay_per_file'] < 1.0:
@@ -278,12 +278,12 @@ def main():
 
         # Сохранение модели в конце эпохи
         logger.info(f'Saving models at epoch {epoch + 1}')
-        model.save(f'epoch_{epoch + 1}')
+        model.save(current_iter)
 
     logger.info('Training completed!')
 
     # Финальное сохранение
-    model.save('final')
+    model.save(current_iter)
 
     # Сохраняем статистику препроцессора
     stats_path = os.path.join(path['models'], 'preprocessor_stats.npz')
