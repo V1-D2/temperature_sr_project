@@ -14,11 +14,11 @@ datasets = {
         'npz_files': [],  # Будет задан в train script
         'preprocessor_args': {
             'target_height': 2000,
-            'target_width': 420
+            'target_width': 220
         },
         'scale_factor': 8,
-        'batch_size': 2,
-        'samples_per_file': 1000,  # Ограничение для управления памятью
+        'batch_size': 8,
+        'samples_per_file': 10000,  # Ограничение для управления памятью
         'num_worker': 4,
         'pin_memory': True,
         'persistent_workers': True
@@ -155,7 +155,7 @@ dist_params = {
 # Специфичные для температурных данных параметры
 temperature_specific = {
     'preserve_relative_values': True,
-    'temperature_range': [200, 350],  # Кельвины
+    'temperature_range': [80, 400],  # Кельвины
     'physical_constraints': {
         'enforce_smoothness': True,
         'preserve_gradients': True,
@@ -168,7 +168,7 @@ incremental_training = {
     'enabled': True,
     'epochs_per_file': 1,
     'learning_rate_decay_per_file': 0.95,
-    'checkpoint_per_file': True,
+    'checkpoint_per_file': False,
     'shuffle_files': True
 }
 
