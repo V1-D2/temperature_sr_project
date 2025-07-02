@@ -167,7 +167,7 @@ def main():
     # Загружаем модель
     print(f"Loading model from {args.model_path}")
     model = TemperatureSRModel(opt)
-    model.load_network(args.model_path, model.net_g, True)
+    model.load_network(args.model_path, 'net_g', True)
     model.net_g.eval()
 
     # Создаем препроцессор
