@@ -167,7 +167,27 @@ def main():
     # Загружаем модель
     print(f"Loading model from {args.model_path}")
     model = TemperatureSRModel(opt)
-    model.load_network(args.model_path, 'net_g', True)
+
+    # Load the checkpoint directly
+    checkpoint = torch.load(args.model_path, map_location='cuda')
+
+    # Debug: print checkpoint keys
+    if isinstance(checkpoint, dict):
+        print(f"Checkpoint keys: {list(checkpoint.keys())}")
+
+    # Check if it's a full checkpoint or just the state dict
+    if isinstance(checkpoint, dict) and 'params' in checkpoint:
+        # It's a full checkpoint from training
+        model.net_g.load_state_dict(checkpoint['params'], strict=True)
+    elif isinstance(checkpoint, dict) and 'state_dict' in checkpoint:
+        # Alternative checkpoint format
+        model.net_g.load_state_dict(checkpoint['state_dict'], strict=True)
+    else:
+        # It's just the state dict
+        model.net_g.load_state_dict(checkpoint, strict=True)
+
+    print("Model loaded successfully!")
+
     model.net_g.eval()
 
     # Создаем препроцессор
