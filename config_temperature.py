@@ -119,7 +119,7 @@ train = {
 
 # Параметры валидации
 val = {
-    'val_freq': 1000,
+    'val_freq': 100000,
     'save_img': True,
     'metrics': {
         'psnr': {
@@ -138,7 +138,7 @@ val = {
 # Логирование
 logger = {
     'print_freq': 100,
-    'save_checkpoint_freq': 5000,
+    'save_checkpoint_freq': 20000,
     'use_tb_logger': True,
     'wandb': {
         'project': 'temperature-sr',
