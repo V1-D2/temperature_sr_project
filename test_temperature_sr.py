@@ -202,7 +202,7 @@ def main():
     # Загружаем тестовые данные
     print(f"Loading test data from {args.input_npz}")
     data = np.load(args.input_npz, allow_pickle=True)
-    swaths = data['swaths']
+    swaths = data['swath_array']
 
     # Ограничиваем количество тестовых образцов
     num_samples = min(args.num_samples, len(swaths))
