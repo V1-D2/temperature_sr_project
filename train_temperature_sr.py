@@ -97,7 +97,7 @@ def create_dataloaders(args, opt, preprocessor, logger):
     return train_loader, val_loader
 
 
-def train_one_epoch(model, dataloader, current_iter, opt, logger, val_loader):
+def train_one_epoch(model, dataloader, current_iter, opt, logger, val_loader, epoch):
     """Обучение на одной эпохе"""
     model.net_g.train()
     if hasattr(model, 'net_d'):
@@ -131,7 +131,7 @@ def train_one_epoch(model, dataloader, current_iter, opt, logger, val_loader):
         # Сохранение модели
         if current_iter % opt['logger']['save_checkpoint_freq'] == 0:
             logger.info('Saving models and training states.')
-            model.save(-1, current_iter)
+            model.save(epoch, current_iter)
 
         # Валидация
         if opt['val'] and current_iter % opt['val']['val_freq'] == 0:
@@ -251,7 +251,7 @@ def main():
             # Обучаем на текущем файле
             for file_epoch in range(incremental_training['epochs_per_file']):
                 logger.info(f'  File epoch {file_epoch + 1}/{incremental_training["epochs_per_file"]}')
-                current_iter = train_one_epoch(model, train_loader, current_iter, opt, logger, val_loader)
+                current_iter = train_one_epoch(model, train_loader, current_iter, opt, logger, val_loader, epoch)
 
             # Сохраняем checkpoint после каждого файла
             if incremental_training['checkpoint_per_file']:

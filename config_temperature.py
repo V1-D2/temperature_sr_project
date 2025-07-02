@@ -137,8 +137,8 @@ val = {
 
 # Логирование
 logger = {
-    'print_freq': 100,
-    'save_checkpoint_freq': 20000,
+    'print_freq': 10000,
+    'save_checkpoint_freq': 400000,
     'use_tb_logger': True,
     'wandb': {
         'project': 'temperature-sr',

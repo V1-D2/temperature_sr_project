@@ -53,6 +53,8 @@ def test_model(model, test_data, save_path=None):
     hr_img = tensor2img([hr_tensor])
     sr_img = tensor2img([sr_tensor])
 
+
+
     # Восстановление оригинальных значений температуры
     if 'metadata' in test_data:
         meta = test_data['metadata']
