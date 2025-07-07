@@ -17,7 +17,7 @@ datasets = {
             'target_width': 220
         },
         'scale_factor': 8,
-        'batch_size': 8,
+        'batch_size': 16,
         'samples_per_file': 10000,  # Ограничение для управления памятью
         'num_worker': 4,
         'pin_memory': True,
@@ -27,7 +27,7 @@ datasets = {
         'name': 'TemperatureValDataset',
         'dataroot_gt': None,
         'npz_file': None,  # Будет задан в train script
-        'n_samples': 100,
+        'n_samples': 10,
         'scale_factor': 8
     }
 }
@@ -73,7 +73,7 @@ train = {
     'ema_decay': 0.999,
     'optim_g': {
         'type': 'Adam',
-        'lr': 2e-4,
+        'lr': 1e-4,
         'weight_decay': 0,
         'betas': [0.9, 0.99]
     },
@@ -92,13 +92,13 @@ train = {
     'pixel_opt': {
         'type': 'PhysicsConsistencyLoss',
         'loss_weight': 1.0,
-        'gradient_weight': 0.05,
-        'smoothness_weight': 0.02,
+        'gradient_weight': 0.01,
+        'smoothness_weight': 0.05,
         'reduction': 'mean'
     },
     'perceptual_opt': {
         'type': 'TemperaturePerceptualLoss',
-        'loss_weight': 0.05,
+        'loss_weight': 0.1,
         'feature_weights': [0.1, 0.1, 1.0, 1.0]
     },
     'gan_opt': {
@@ -106,11 +106,11 @@ train = {
         'gan_type': 'lsgan',
         'real_label_val': 1.0,
         'fake_label_val': 0.0,
-        'loss_weight': 0.05
+        'loss_weight': 0.01
     },
     # Параметры дискриминатора
-    'net_d_iters': 2,
-    'net_d_init_iters': 2000,
+    'net_d_iters': 1,
+    'net_d_init_iters': 1000,
     # Частота сохранения
     'manual_seed': 10,
     'use_grad_clip': True,
@@ -120,7 +120,7 @@ train = {
 
 # Параметры валидации
 val = {
-    'val_freq': 5000,
+    'val_freq': 2000,
     'save_img': True,
     'metrics': {
         'psnr': {
@@ -138,7 +138,7 @@ val = {
 
 # Логирование
 logger = {
-    'print_freq': 5000,
+    'print_freq': 1000,
     'save_checkpoint_freq': 100000,
     'use_tb_logger': True,
     'wandb': {

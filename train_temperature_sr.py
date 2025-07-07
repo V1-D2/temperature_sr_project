@@ -32,6 +32,28 @@ from config_temperature import (
 )
 
 
+def check_training_progress(model, logger, current_iter):
+    """Проверка что модель действительно обучается"""
+    if hasattr(model, 'net_g'):
+        # Получаем норму градиентов
+        total_norm = 0
+        param_count = 0
+        for p in model.net_g.parameters():
+            if p.grad is not None:
+                param_norm = p.grad.data.norm(2)
+                total_norm += param_norm.item() ** 2
+                param_count += 1
+
+        if param_count > 0:
+            total_norm = total_norm ** (1. / 2.)
+            logger.info(f'[Iter {current_iter}] Generator gradient norm: {total_norm:.4f}')
+
+            if total_norm < 1e-8:
+                logger.warning('WARNING: Generator gradients are near zero!')
+        else:
+            logger.warning('WARNING: No gradients found in generator!')
+
+
 def parse_args():
     parser = argparse.ArgumentParser(description='Train Temperature Super-Resolution Model')
     parser.add_argument('--data_dir', type=str, required=True,
@@ -112,6 +134,9 @@ def train_one_epoch(model, dataloader, current_iter, opt, logger, val_loader, ep
         # Обучение модели
         model.feed_data(train_data)
         model.optimize_parameters(current_iter)
+
+        if current_iter % 1000 == 0:
+            check_training_progress(model, logger, current_iter)
 
         # Обновление learning rate
         model.update_learning_rate(current_iter, warmup_iter=opt['train'].get('warmup_iter', -1))
