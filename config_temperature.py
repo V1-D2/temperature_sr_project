@@ -84,21 +84,21 @@ train = {
         'betas': [0.9, 0.99]
     },
     'scheduler': {
-        'type': 'MultiStepLR',
-        'milestones': [100000, 200000, 300000, 400000],
-        'gamma': 0.5
+        'type': 'CosineAnnealingLR',
+        'T_max': 70000,
+        'eta_min': 1e-6
     },
     # Loss функции
     'pixel_opt': {
         'type': 'PhysicsConsistencyLoss',
         'loss_weight': 1.0,
-        'gradient_weight': 0.1,
-        'smoothness_weight': 0.05,
+        'gradient_weight': 0.05,
+        'smoothness_weight': 0.02,
         'reduction': 'mean'
     },
     'perceptual_opt': {
         'type': 'TemperaturePerceptualLoss',
-        'loss_weight': 0.1,
+        'loss_weight': 0.05,
         'feature_weights': [0.1, 0.1, 1.0, 1.0]
     },
     'gan_opt': {
@@ -106,20 +106,21 @@ train = {
         'gan_type': 'lsgan',
         'real_label_val': 1.0,
         'fake_label_val': 0.0,
-        'loss_weight': 0.1
+        'loss_weight': 0.05
     },
     # Параметры дискриминатора
-    'net_d_iters': 1,
-    'net_d_init_iters': 1000,
+    'net_d_iters': 2,
+    'net_d_init_iters': 2000,
     # Частота сохранения
     'manual_seed': 10,
     'use_grad_clip': True,
-    'grad_clip_norm': 1.0
+    'grad_clip_norm': 0.5,
+    'use_ema': True                 # Exponential Moving Averag
 }
 
 # Параметры валидации
 val = {
-    'val_freq': 100000,
+    'val_freq': 5000,
     'save_img': True,
     'metrics': {
         'psnr': {
@@ -137,8 +138,8 @@ val = {
 
 # Логирование
 logger = {
-    'print_freq': 10000,
-    'save_checkpoint_freq': 400000,
+    'print_freq': 5000,
+    'save_checkpoint_freq': 100000,
     'use_tb_logger': True,
     'wandb': {
         'project': 'temperature-sr',
@@ -167,7 +168,7 @@ temperature_specific = {
 incremental_training = {
     'enabled': True,
     'epochs_per_file': 1,
-    'learning_rate_decay_per_file': 0.95,
+    'learning_rate_decay_per_file': 1.0,
     'checkpoint_per_file': False,
     'shuffle_files': True
 }

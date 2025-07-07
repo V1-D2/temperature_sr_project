@@ -78,7 +78,7 @@ apptainer exec --nv \
     python train_temperature_sr.py \
     --data_dir ./data \
     --output_dir ./experiments \
-    --num_epochs 20
+    --num_epochs 70
 
 echo "============================================"
 echo "Temperature SR Training Job Finished: $(date)"
