@@ -79,7 +79,7 @@ train = {
     },
     'optim_d': {
         'type': 'Adam',
-        'lr': 1e-4,
+        'lr': 1e-5,
         'weight_decay': 0,
         'betas': [0.9, 0.99]
     },
@@ -104,17 +104,17 @@ train = {
     'gan_opt': {
         'type': 'gan',
         'gan_type': 'lsgan',
-        'real_label_val': 1.0,
-        'fake_label_val': 0.0,
-        'loss_weight': 0.01
+        'real_label_val': 0.9,
+        'fake_label_val': 0.1,
+        'loss_weight': 0.1
     },
     # Параметры дискриминатора
-    'net_d_iters': 1,
-    'net_d_init_iters': 1000,
+    'net_d_iters': 10,
+    'net_d_init_iters': 2000,
     # Частота сохранения
     'manual_seed': 10,
-    'use_grad_clip': True,
-    'grad_clip_norm': 0.5,
+    'use_grad_clip': False,
+    #'grad_clip_norm': 0.5,
     'use_ema': True                 # Exponential Moving Averag
 }
 
